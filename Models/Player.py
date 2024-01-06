@@ -2,6 +2,7 @@ from Models.SongState import SongState
 import pygame
 import os
 import time
+import threading
 
 class Player:
     def  __init__(self, music_dir: str) -> None:
@@ -12,6 +13,20 @@ class Player:
         except ValueError:
             pass
         self.state = SongState()
+
+        pygame.mixer.music.set_endevent(pygame.USEREVENT + 1)
+        pygame.init()
+        
+        self.event_thread = threading.Thread(target=self._pygame_event_handler)
+        self.event_thread.daemon = True
+        self.event_thread.start()
+
+    def _pygame_event_handler(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.USEREVENT + 1:
+                    self.play_next()
+            time.sleep(0.1)
 
     def load_first_song(self) -> None:
         pygame.mixer.init()
@@ -36,10 +51,11 @@ class Player:
         self.state.set_playing(True)
     
     def play_next(self, e=None) -> None:
-        pygame.mixer.music.stop()
+        self.pause()
         try:
             self.state.set_song(self.songs[self.state.song_index + 1], self.state.song_index + 1)
         except IndexError:
             self.state.set_song(self.songs[0], 0)
+
         self.load_song(f"{self.music_dir}/{self.songs[self.state.song_index]}")
         self.play()
