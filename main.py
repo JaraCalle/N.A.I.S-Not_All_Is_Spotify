@@ -1,57 +1,50 @@
-import pygame
-import os
-import time
+import flet as ft
+import utils.generator as gen
+from Models.Player import Player
 
-def cargar_cancion(ruta_cancion):
-    pygame.mixer.init()
-    pygame.mixer.music.load(ruta_cancion)
+player = Player("src/songs/")
+def main(page: ft.Page) -> None:
+    # Page settings
+    page.title = "N.A.I.S - Not All Is Spotify"
+    page.window_height, page.window_width = 110, 320
+    page.window_maximizable, page.window_resizable = False, False
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-def reproducir():
-    pygame.mixer.music.play()
+    player.load_random_song()
+    controls = ft.Row(
+            [
+                ft.IconButton(icon=ft.icons.SKIP_PREVIOUS_ROUNDED,
+                    icon_color="GREEN_ACCENT_200",
+                    icon_size=40,
+                    on_click=player.pause,
+                ),
+                ft.IconButton(
+                    icon=ft.icons.PAUSE_CIRCLE_FILLED_ROUNDED,
+                    icon_color="#FFFFFF",
+                    icon_size=40,
+                    on_click=player.pause,
+                ),
+                ft.IconButton(
+                    icon=ft.icons.PLAY_CIRCLE_OUTLINE_ROUNDED,
+                    icon_color="#1FDF64",
+                    icon_size=40,
+                    on_click=player.unpause,
+                ),
+                ft.IconButton(icon=ft.icons.SKIP_NEXT_ROUNDED,
+                    icon_color="GREEN_ACCENT_200",
+                    icon_size=40,
+                    on_click=player.play_random_next,
+                ),
+            ], 
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
 
-def pausar():
-    pygame.mixer.music.pause()
+    display = ft.Column(
+        [
+            controls,
+        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
+    )
 
-def continuar():
-    pygame.mixer.music.unpause()
+    page.add(display)
 
-def detener():
-    pygame.mixer.music.stop()
-
-def adelantar(segundos):
-    tiempo_actual = pygame.mixer.music.get_pos() // 1000
-    nuevo_tiempo = tiempo_actual + segundos
-    pygame.mixer.music.set_pos(nuevo_tiempo)
-
-if __name__ == "__main__":
-    # Ruta de la canción que deseas reproducir
-    ruta_cancion = "src/songs/cancion.mp3"
-
-    # Comprueba si el archivo de la canción existe
-    if os.path.exists(ruta_cancion):
-        cargar_cancion(ruta_cancion)
-        reproducir()
-
-        while pygame.mixer.music.get_busy():
-            # Controles avanzados
-            accion = input("A: Adelantar, P: Pausar, C: Continuar, D: Detener, Q: Salir\n").upper()
-
-            if accion == "A":
-                segundos = int(input("Número de segundos para adelantar: "))
-                adelantar(segundos)
-            elif accion == "P":
-                pausar()
-                while True:
-                    resume = input("Presiona 'C' para continuar o 'D' para detener: ").upper()
-                    if resume == "C":
-                        continuar()
-                        break
-                    elif resume == "D":
-                        detener()
-                        break
-            elif accion == "D":
-                detener()
-                break
-            elif accion == "Q":
-                detener()
-                break
+ft.app(target=main)

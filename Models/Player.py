@@ -3,6 +3,7 @@ import pygame
 import os
 import time
 import threading
+import random
 
 class Player:
     def  __init__(self, music_dir: str) -> None:
@@ -34,6 +35,13 @@ class Player:
         pygame.mixer.music.load(f"{self.music_dir}/{self.songs[self.state.song_index]}")
         self.play()
 
+    def load_random_song(self) -> None:
+        pygame.mixer.init()
+        song_index = random.randint(0, len(self.songs) - 1)
+        self.state.set_song(self.songs[song_index], song_index)
+        pygame.mixer.music.load(f"{self.music_dir}/{self.songs[self.state.song_index]}")
+        self.play()
+
     def load_song(self, song: str) -> None:
         pygame.mixer.init()
         pygame.mixer.music.load(song)
@@ -57,5 +65,14 @@ class Player:
         except IndexError:
             self.state.set_song(self.songs[0], 0)
 
+        self.load_song(f"{self.music_dir}/{self.songs[self.state.song_index]}")
+        self.play()
+
+    def play_random_next(self, e=None) -> None:
+        self.pause()
+        song_index = random.randint(0, len(self.songs) - 1)
+        while song_index == self.state.song_index:
+            song_index = random.randint(0, len(self.songs) - 1)
+        self.state.set_song(self.songs[song_index], song_index)
         self.load_song(f"{self.music_dir}/{self.songs[self.state.song_index]}")
         self.play()
