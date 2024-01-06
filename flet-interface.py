@@ -6,18 +6,11 @@ player = Player("src/songs/")
 def main(page: ft.Page) -> None:
     # Page settings
     page.title = "N.A.I.S - Not All Is Spotify"
+    page.window_height, page.window_width = 110, 320
+    page.window_maximizable, page.window_resizable = False, False
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-    gen.generate_cover()
     player.load_first_song()
-    img = ft.Image(
-        src=f"src/images/cover.jpg",
-        width=300,
-        height=300,
-        border_radius=10,
-        fit=ft.ImageFit.COVER,
-    )
-
     controls = ft.Row(
             [
                 ft.IconButton(icon=ft.icons.SKIP_PREVIOUS_ROUNDED,
@@ -52,7 +45,6 @@ def main(page: ft.Page) -> None:
 
     display = ft.Column(
         [
-            img,
             controls,
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
